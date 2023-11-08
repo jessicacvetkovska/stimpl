@@ -23,9 +23,13 @@ class State(object):
         return State(variable_name, variable_value, variable_type, self)
 
     def get_value(self, variable_name) -> Any:
-        """ TODO: Implement. """
-        return None
-
+        if self.variable_name == variable_name:
+            return self.value
+        elif self.next_state == None:
+            return None
+        else:
+            return self.next_state.get_value(variable_name)
+    
     def __repr__(self) -> str:
         return f"{self.variable_name}: {self.value}, " + repr(self.next_state)
 
@@ -79,8 +83,12 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (printable_value, printable_type, new_state)
 
         case Sequence(exprs=exprs) | Program(exprs=exprs):
-            """ TODO: Implement. """
-            pass
+            # got help from Mitch Koski (in class review session on 11/8)
+            new_val, new_type, new_state = None, Unit(), state
+
+            for expr in exprs:
+                new_val, new_type, new_state = evaluate(expr, new_state)
+            return(new_val, new_type, new_state)
 
         case Variable(variable_name=variable_name):
             value = state.get_value(variable_name)
