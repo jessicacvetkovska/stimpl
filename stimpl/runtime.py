@@ -170,6 +170,7 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, left_type, new_state)
 
         case Divide(left=left, right=right):
+            # copy and paste of Multiply method with several things changed
             result = 0
             left_result, left_type, new_state = evaluate(left, state)
             right_result, right_type, new_state = evaluate(right, new_state)
