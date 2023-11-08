@@ -86,8 +86,10 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             # got help from Mitch Koski (in class review session on 11/8)
             new_val, new_type, new_state = None, Unit(), state
 
+            # walking the tree
             for expr in exprs:
                 new_val, new_type, new_state = evaluate(expr, new_state)
+            
             return(new_val, new_type, new_state)
 
         case Variable(variable_name=variable_name):
