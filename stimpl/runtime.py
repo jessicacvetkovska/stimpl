@@ -256,8 +256,27 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, Boolean(), new_state)
 
         case Lte(left=left, right=right):
-            """ TODO: Implement. """
-            pass
+            # copy and paste of Lt method with several things changed
+            left_value, left_type, new_state = evaluate(left, state)
+            right_value, right_type, new_state = evaluate(right, new_state)
+
+            result = None
+
+            if left_type != right_type:
+                raise InterpTypeError(f"""Mismatched types for Lte:
+            Cannot compare {left_type} and {right_type}""")
+
+            match left_type:
+                case Integer() | Boolean() | String() | FloatingPoint():
+                    result = left_value <= right_value
+                case Unit():
+                    # this needs to be true as two ren units are equivalent
+                    result = True
+                case _:
+                    raise InterpTypeError(
+                        f"Cannot perform <= on {left_type} type.")
+
+            return (result, Boolean(), new_state)
 
         case Gt(left=left, right=right):
             """ TODO: Implement. """
