@@ -176,6 +176,9 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             left_result, left_type, new_state = evaluate(left, state)
             right_result, right_type, new_state = evaluate(right, new_state)
 
+            # needs to check for divide by zero
+            if right_result == 0:
+                raise InterpMathError("Attempted to divide by zero.")
             if left_type != right_type:
                 raise InterpTypeError(f"""Mismatched types for Divide:
             Cannot divide {left_type} to {right_type}""")
@@ -240,8 +243,18 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, new_type, new_state)
 
         case If(condition=condition, true=true, false=false):
-            """ TODO: Implement. """
-            pass
+            condition_value, condition_type, new_state = evaluate(condition, state)
+            match condition_type:
+                case Boolean():
+                    # copy and pasted from Or method and changed left/right to true/false
+                    true_value, true_type, new_state = evaluate(true, new_state)
+                    false_value, false_type, new_state = evaluate(false, new_state)
+                    if condition_value == True:
+                        return (true_value, true_type, new_state)
+                    return (false_value, false_type, new_state)
+                case _:
+                    raise InterpTypeError("Cannot perform if on non-boolean operands.")
+
 
         case Lt(left=left, right=right):
             left_value, left_type, new_state = evaluate(left, state)
