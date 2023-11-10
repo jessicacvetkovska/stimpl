@@ -82,7 +82,7 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (printable_value, printable_type, new_state)
 
         case Sequence(exprs=exprs) | Program(exprs=exprs):
-            # got help from Mitch Koski (in class review session on 11/8)
+            # got help from Mitch Koski regarding Sequence() implementation (in class review session on 11/8)
             new_val, new_type, new_state = None, Unit(), state
 
             # walking the tree
@@ -133,7 +133,7 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, left_type, new_state)
 
         case Subtract(left=left, right=right):
-            # copy and paste of Add method with several things changed
+            # copy and paste of Add case with several things changed
             result = 0
             left_result, left_type, new_state = evaluate(left, state)
             right_result, right_type, new_state = evaluate(right, new_state)
@@ -152,7 +152,7 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, left_type, new_state)
 
         case Multiply(left=left, right=right):
-            # copy and paste of Subtract method with several things changed
+            # copy and paste of Subtract case with several things changed
             result = 0
             left_result, left_type, new_state = evaluate(left, state)
             right_result, right_type, new_state = evaluate(right, new_state)
@@ -171,7 +171,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, left_type, new_state)
 
         case Divide(left=left, right=right):
-            # copy and paste of Multiply method with several things changed
+            # copy and paste of Multiply case with several things changed
+            # can only be a FloatingPoint or an Integer
             result = 0
             left_result, left_type, new_state = evaluate(left, state)
             right_result, right_type, new_state = evaluate(right, new_state)
@@ -184,6 +185,7 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             Cannot divide {left_type} to {right_type}""")
 
             match left_type:
+                # strings cannot be used in division
                 # need separate cases for FloatingPoint and Integer division
                 case FloatingPoint():
                     result = left_result / right_result
@@ -212,7 +214,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, left_type, new_state)
 
         case Or(left=left, right=right):
-            # copy and paste of And method with several things changed
+            # copy and paste of And case with several things changed
+            # needs to be a Boolean, otherwise this will not work
             left_value, left_type, new_state = evaluate(left, state)
             right_value, right_type, new_state = evaluate(right, new_state)
 
@@ -229,9 +232,10 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, left_type, new_state)
 
         case Not(expr=expr):
-            # copy and paste of Or method with several things changed
+            # copy and paste of Or case with several things changed
             # no need to compare left/right as not works on the whole expression
             # so there will be no InterpTypeError for mismatched types
+            # needs to be a Boolean, otherwise this will not work
             new_val, new_type, new_state = evaluate(expr, state)
             match new_type:
                 case Boolean():
@@ -243,10 +247,11 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, new_type, new_state)
 
         case If(condition=condition, true=true, false=false):
+            # needs to be a Boolean, otherwise this will not work
             condition_value, condition_type, new_state = evaluate(condition, state)
             match condition_type:
                 case Boolean():
-                    # copy and pasted from Or method and changed left/right to true/false
+                    # copy and pasted from Or case and changed left/right to true/false
                     true_value, true_type, new_state = evaluate(true, new_state)
                     false_value, false_type, new_state = evaluate(false, new_state)
                     if condition_value == True:
@@ -278,7 +283,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, Boolean(), new_state)
 
         case Lte(left=left, right=right):
-            # copy and paste of Lt method with several things changed
+            # copy and paste of Lt case with several things changed
+            # can be done with Integers, Booleans, Strings, FloatingPoints, and Units
             left_value, left_type, new_state = evaluate(left, state)
             right_value, right_type, new_state = evaluate(right, new_state)
 
@@ -301,7 +307,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, Boolean(), new_state)
 
         case Gt(left=left, right=right):
-            # copy and paste of the Lt method with several things changed
+            # copy and paste of the Lt case with several things changed
+            # can be done with Integers, Booleans, Strings, FloatingPoints, and Units
             left_value, left_type, new_state = evaluate(left, state)
             right_value, right_type, new_state = evaluate(right, new_state)
 
@@ -323,7 +330,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, Boolean(), new_state)
 
         case Gte(left=left, right=right):
-            # copy and paste of Lte method with several things changed
+            # copy and paste of Lte case with several things changed
+            # can be done with Integers, Booleans, Strings, FloatingPoints, and Units
             left_value, left_type, new_state = evaluate(left, state)
             right_value, right_type, new_state = evaluate(right, new_state)
 
@@ -346,7 +354,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, Boolean(), new_state)
 
         case Eq(left=left, right=right):
-            # copy and paste of Gte method with several things changed
+            # copy and paste of Gte case with several things changed
+            # can be done with Integers, Booleans, Strings, FloatingPoints, and Units
             left_value, left_type, new_state = evaluate(left, state)
             right_value, right_type, new_state = evaluate(right, new_state)
 
@@ -369,7 +378,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, Boolean(), new_state)
 
         case Ne(left=left, right=right):
-            # copy and paste of Eq method with several things changed
+            # copy and paste of Eq case with several things changed
+            # can be done with Integers, Booleans, Strings, FloatingPoints, and Units
             left_value, left_type, new_state = evaluate(left, state)
             right_value, right_type, new_state = evaluate(right, new_state)
 
@@ -391,8 +401,18 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, Boolean(), new_state)
 
         case While(condition=condition, body=body):
-            """ TODO: Implement. """
-            pass
+            # copy pasted from If case with several things changed
+            # needs to be a Boolean, otherwise this will not work
+            condition_value, condition_type, new_state = evaluate(condition, state)
+            match condition_type:
+                case Boolean():
+                    while condition_value:
+                        new_val, new_type, new_state = evaluate(body, new_state)
+                        condition_value, condition_type, new_state = evaluate(condition, new_state)
+                case _:
+                    raise InterpTypeError("Cannot perform while on non-boolean operands.")
+            
+            return (False, Boolean(), new_state)
 
         case _:
             raise InterpSyntaxError("Unhandled!")
