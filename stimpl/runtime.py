@@ -226,8 +226,18 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             return (result, left_type, new_state)
 
         case Not(expr=expr):
-            """ TODO: Implement. """
-            pass
+            # copy and paste of Or method with several things changed
+            # no need to compare left/right as not works on the whole expression
+            # so there will be no InterpTypeError for mismatched types
+            new_val, new_type, new_state = evaluate(expr, state)
+            match new_type:
+                case Boolean():
+                    result = not new_val
+                case _:
+                    raise InterpTypeError(
+                        "Cannot perform logical not on non-boolean operands.")
+
+            return (result, left_type, new_state)
 
         case If(condition=condition, true=true, false=false):
             """ TODO: Implement. """
