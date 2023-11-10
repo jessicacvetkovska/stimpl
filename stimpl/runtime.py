@@ -144,7 +144,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             Cannot subtract {left_type} to {right_type}""")
 
             match left_type:
-                case Integer() | String() | FloatingPoint():
+                # strings cannot be used in subtraction
+                case Integer() | FloatingPoint():
                     result = left_result - right_result
                 case _:
                     raise InterpTypeError(f"""Cannot subtract {left_type}s""")
@@ -162,7 +163,8 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             Cannot multiply {left_type} to {right_type}""")
 
             match left_type:
-                case Integer() | String() | FloatingPoint():
+                # strings cannot be used in multiplication
+                case Integer() | FloatingPoint():
                     result = left_result * right_result
                 case _:
                     raise InterpTypeError(f"""Cannot multiply {left_type}s""")
@@ -180,8 +182,12 @@ def evaluate(expression: Expr, state: State) -> Tuple[Optional[Any], Type, State
             Cannot divide {left_type} to {right_type}""")
 
             match left_type:
-                case Integer() | String() | FloatingPoint():
+                # need separate cases for FloatingPoint and Integer division
+                case FloatingPoint():
                     result = left_result / right_result
+                case Integer():
+                    # double slashes are for integer division
+                    result = left_result // right_result
                 case _:
                     raise InterpTypeError(f"""Cannot divide {left_type}s""")
 
