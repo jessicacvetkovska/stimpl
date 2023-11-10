@@ -23,10 +23,9 @@ class State(object):
         return State(variable_name, variable_value, variable_type, self)
 
     def get_value(self, variable_name) -> Any:
+        # recursively check for values
         if self.variable_name == variable_name:
             return self.value
-        elif self.next_state == None:
-            return None
         else:
             return self.next_state.get_value(variable_name)
     
